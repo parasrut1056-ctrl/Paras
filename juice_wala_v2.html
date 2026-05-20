@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Juice Wala | Kothrud</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{background:#f6f7fb;color:#222;padding-bottom:120px;}
+:root{
+  --primary:#16a34a;
+  --dark:#111827;
+  --white:#fff;
+  --gray:#6b7280;
+  --shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+header{background:linear-gradient(135deg,#16a34a,#0f7a37);padding:18px;color:white;position:sticky;top:0;z-index:1000;box-shadow:var(--shadow);}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.logo h1{font-size:28px;font-weight:700;}
+.logo p{font-size:13px;margin-top:4px;opacity:0.95;}
+.delivery{background:rgba(255,255,255,0.18);padding:10px 14px;border-radius:14px;font-size:13px;font-weight:500;backdrop-filter:blur(10px);text-align:center;}
+.hero{margin:15px;padding:18px;background:white;border-radius:22px;box-shadow:var(--shadow);}
+.hero h2{font-size:24px;margin-bottom:8px;}
+.hero p{font-size:14px;color:var(--gray);line-height:1.7;}
+.location{margin-top:12px;font-weight:600;color:var(--primary);}
+.categories{display:flex;gap:10px;overflow-x:auto;padding:0 15px 15px;scrollbar-width:none;}
+.categories button{border:none;padding:10px 18px;border-radius:50px;background:white;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow);transition:0.3s;}
+.categories button.active,.categories button:hover{background:var(--primary);color:white;}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px;padding:15px;}
+.card{background:white;border-radius:20px;overflow:hidden;box-shadow:var(--shadow);transition:0.3s;}
+.card:hover{transform:translateY(-5px);}
+.card img{width:100%;height:170px;object-fit:cover;}
+.card-content{padding:12px;}
+.card h3{font-size:16px;margin-bottom:6px;}
+.price{font-size:18px;font-weight:700;color:var(--primary);margin-bottom:6px;}
+.desc{font-size:12px;color:var(--gray);margin-bottom:12px;min-height:35px;}
+.add-btn{width:100%;border:none;padding:11px;background:var(--primary);color:white;font-weight:600;border-radius:12px;cursor:pointer;transition:0.3s;}
+.add-btn:hover{background:#0d8b3d;}
+
+/* Floating buttons */
+.cart-float{position:fixed;bottom:20px;right:20px;width:68px;height:68px;background:var(--dark);border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:28px;color:white;cursor:pointer;box-shadow:var(--shadow);z-index:999;}
+.cart-count{position:absolute;top:-4px;right:-2px;background:red;width:24px;height:24px;display:flex;justify-content:center;align-items:center;border-radius:50%;font-size:12px;font-weight:700;}
+.whatsapp-float{position:fixed;bottom:100px;right:20px;background:#25D366;color:white;padding:14px 18px;border-radius:50px;text-decoration:none;font-weight:600;box-shadow:var(--shadow);z-index:999;cursor:pointer;border:none;font-family:'Poppins',sans-serif;font-size:14px;}
+.track-float{position:fixed;bottom:165px;right:20px;background:#f59e0b;color:white;padding:14px 18px;border-radius:50px;text-decoration:none;font-weight:600;box-shadow:var(--shadow);z-index:999;cursor:pointer;border:none;font-family:'Poppins',sans-serif;font-size:14px;}
+
+/* Cart modal */
+.cart-modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;justify-content:flex-end;z-index:9999;}
+.cart-box{background:white;width:100%;max-width:420px;height:100%;overflow-y:auto;padding:20px;animation:slideIn 0.3s ease;}
+@keyframes slideIn{from{transform:translateX(100%);}to{transform:translateX(0);}}
+.cart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.close-cart{font-size:28px;cursor:pointer;}
+.cart-item{display:flex;gap:10px;background:#f9fafb;padding:10px;border-radius:14px;margin-bottom:15px;}
+.cart-item img{width:75px;height:75px;object-fit:cover;border-radius:12px;}
+.cart-info{flex:1;}
+.qty-controls{display:flex;align-items:center;gap:10px;margin-top:8px;}
+.qty-controls button{width:28px;height:28px;border:none;background:var(--primary);color:white;border-radius:8px;cursor:pointer;}
+.remove-btn{margin-top:8px;border:none;background:red;color:white;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:12px;}
+.total{font-size:22px;font-weight:700;margin:20px 0;}
+.checkout-form{display:flex;flex-direction:column;gap:12px;}
+.checkout-form input,.checkout-form textarea{padding:14px;border:1px solid #ddd;border-radius:12px;font-size:14px;font-family:'Poppins',sans-serif;}
+.empty{text-align:center;padding:30px;color:var(--gray);}
+.success{background:#dcfce7;padding:14px;border-radius:12px;color:#166534;display:none;margin-bottom:15px;font-weight:600;}
+
+/* Order action buttons */
+.order-actions{display:flex;flex-direction:column;gap:10px;margin-top:5px;}
+.place-btn{padding:15px;border:none;background:var(--primary);color:white;font-size:16px;font-weight:700;border-radius:14px;cursor:pointer;font-family:'Poppins',sans-serif;}
+.whatsapp-btn{padding:14px;border:none;background:#25D366;color:white;font-size:15px;font-weight:700;border-radius:14px;cursor:pointer;font-family:'Poppins',sans-serif;}
+.gmail-btn{padding:14px;border:none;background:#EA4335;color:white;font-size:15px;font-weight:700;border-radius:14px;cursor:pointer;font-family:'Poppins',sans-serif;}
+.or-divider{text-align:center;color:var(--gray);font-size:13px;position:relative;}
+.or-divider::before,.or-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:#ddd;}
+.or-divider::before{left:0;}
+.or-divider::after{right:0;}
+
+/* Order Tracking Modal */
+.track-modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:flex-end;z-index:9999;}
+.track-box{background:white;width:100%;max-width:480px;border-radius:24px 24px 0 0;padding:24px;animation:slideUp 0.35s ease;max-height:85vh;overflow-y:auto;}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.track-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.close-track{font-size:28px;cursor:pointer;}
+.track-id-input{display:flex;gap:10px;margin-bottom:20px;}
+.track-id-input input{flex:1;padding:13px;border:1.5px solid #ddd;border-radius:12px;font-size:14px;font-family:'Poppins',sans-serif;}
+.track-id-input button{padding:13px 18px;background:var(--primary);color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;}
+.order-card{background:#f9fafb;border-radius:16px;padding:16px;margin-bottom:16px;}
+.order-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.order-id{font-weight:700;font-size:14px;color:var(--dark);}
+.order-time{font-size:12px;color:var(--gray);}
+.order-status-badge{padding:5px 12px;border-radius:50px;font-size:12px;font-weight:700;}
+.status-placed{background:#fef9c3;color:#854d0e;}
+.status-confirmed{background:#dbeafe;color:#1e40af;}
+.status-preparing{background:#ffe4e6;color:#be123c;}
+.status-out{background:#fff7ed;color:#c2410c;}
+.status-delivered{background:#dcfce7;color:#166534;}
+
+/* Timeline */
+.timeline{margin-top:12px;}
+.tl-step{display:flex;gap:12px;margin-bottom:10px;align-items:flex-start;}
+.tl-dot{width:24px;height:24px;border-radius:50%;border:2px solid #ddd;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;margin-top:2px;}
+.tl-dot.done{background:var(--primary);border-color:var(--primary);color:white;}
+.tl-dot.active{background:#f59e0b;border-color:#f59e0b;color:white;animation:pulse 1.2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+.tl-text h4{font-size:14px;font-weight:600;}
+.tl-text p{font-size:12px;color:var(--gray);}
+.order-items-mini{margin-top:10px;font-size:13px;color:var(--gray);}
+.order-items-mini strong{color:var(--dark);}
+.no-orders{text-align:center;padding:30px;color:var(--gray);}
+.track-tabs{display:flex;gap:10px;margin-bottom:18px;}
+.track-tab{flex:1;padding:10px;border:2px solid #eee;border-radius:12px;background:white;cursor:pointer;font-weight:600;font-size:13px;font-family:'Poppins',sans-serif;transition:0.2s;}
+.track-tab.active{background:var(--primary);color:white;border-color:var(--primary);}
+
+footer{margin-top:30px;padding:20px;text-align:center;font-size:14px;color:var(--gray);}
+
+/* Nutrition badge on card */
+.cal-badge{display:inline-block;background:#dcfce7;color:#15803d;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;margin-bottom:6px;}
+
+/* Nutrition info button */
+.nutrition-btn{width:100%;margin-top:6px;border:1.5px solid var(--primary);background:transparent;color:var(--primary);font-weight:600;border-radius:12px;padding:8px;cursor:pointer;font-size:12px;font-family:'Poppins',sans-serif;transition:0.2s;}
+.nutrition-btn:hover{background:var(--primary);color:white;}
+
+/* Nutrition popup modal */
+.nutrition-modal{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;justify-content:center;align-items:center;z-index:99999;padding:20px;}
+.nutrition-box{background:white;border-radius:24px;padding:24px;max-width:340px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.2);animation:popIn 0.25s ease;}
+@keyframes popIn{from{transform:scale(0.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+.nutrition-box h3{font-size:18px;font-weight:700;margin-bottom:4px;}
+.nutrition-box .nut-sub{font-size:12px;color:var(--gray);margin-bottom:16px;}
+.nut-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+.nut-item{background:#f6f7fb;border-radius:14px;padding:12px;text-align:center;}
+.nut-item .nut-val{font-size:20px;font-weight:700;color:var(--primary);}
+.nut-item .nut-label{font-size:11px;color:var(--gray);margin-top:2px;}
+.nut-item.full{grid-column:1/-1;}
+.close-nut-btn{width:100%;padding:12px;border:none;background:var(--primary);color:white;font-weight:700;border-radius:12px;cursor:pointer;font-size:14px;font-family:'Poppins',sans-serif;}
+
+/* Add-to-cart toast */
+.nut-toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(30px);background:#111827;color:white;border-radius:16px;padding:14px 18px;max-width:320px;width:90%;z-index:99998;opacity:0;transition:all 0.35s ease;pointer-events:none;box-shadow:0 8px 30px rgba(0,0,0,0.3);}
+.nut-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.nut-toast-title{font-size:13px;font-weight:700;margin-bottom:8px;color:#86efac;}
+.nut-toast-row{display:flex;justify-content:space-between;font-size:12px;color:#d1d5db;padding:2px 0;}
+.nut-toast-row span:last-child{color:white;font-weight:600;}
+
+/* Cart item calorie tag */
+.cal-tag{display:inline-block;background:#dcfce7;color:#15803d;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-top:4px;}
+
+/* Cart total nutrition bar */
+.cart-nutrition-bar{background:#f0fdf4;border-radius:14px;padding:14px;margin-bottom:16px;}
+.cart-nutrition-bar h4{font-size:13px;font-weight:700;color:#166534;margin-bottom:10px;}
+.cnb-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;}
+.cnb-item .cnb-val{font-size:15px;font-weight:700;color:var(--primary);}
+.cnb-item .cnb-label{font-size:10px;color:var(--gray);}
+
+/* ── About Us ── */
+.about-section{margin:15px;background:white;border-radius:22px;box-shadow:var(--shadow);overflow:hidden;}
+.about-banner{background:linear-gradient(135deg,#16a34a,#0f7a37);padding:28px 20px;text-align:center;color:white;}
+.about-banner h2{font-size:22px;font-weight:700;margin-bottom:6px;}
+.about-banner p{font-size:13px;opacity:0.9;line-height:1.6;}
+.about-body{padding:20px;}
+.about-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.stat-card{background:#f6f7fb;border-radius:16px;padding:14px;text-align:center;}
+.stat-card .stat-val{font-size:22px;font-weight:700;color:var(--primary);}
+.stat-card .stat-label{font-size:11px;color:var(--gray);margin-top:2px;}
+.about-story{font-size:13px;color:var(--gray);line-height:1.8;margin-bottom:18px;}
+.about-values{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+.value-chip{background:#f0fdf4;border-radius:14px;padding:12px;font-size:12px;color:#166534;font-weight:600;}
+.value-chip span{display:block;font-size:18px;margin-bottom:4px;}
+.about-contact{background:#f6f7fb;border-radius:16px;padding:14px;}
+.about-contact h4{font-size:14px;font-weight:700;margin-bottom:10px;}
+.contact-row{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--gray);padding:5px 0;}
+.contact-row a{color:var(--primary);text-decoration:none;font-weight:600;}
+
+/* ── Feedback & Complaint ── */
+.feedback-section{margin:15px;background:white;border-radius:22px;box-shadow:var(--shadow);overflow:hidden;}
+.feedback-header{background:linear-gradient(135deg,#1d4ed8,#4338ca);padding:22px 20px;color:white;text-align:center;}
+.feedback-header h2{font-size:20px;font-weight:700;margin-bottom:4px;}
+.feedback-header p{font-size:13px;opacity:0.9;}
+.feedback-tabs{display:flex;margin:16px 16px 0;gap:8px;}
+.fb-tab{flex:1;padding:10px;border:2px solid #e5e7eb;border-radius:12px;background:white;font-weight:600;font-size:13px;cursor:pointer;font-family:'Poppins',sans-serif;transition:0.2s;color:#374151;}
+.fb-tab.active{background:#1d4ed8;color:white;border-color:#1d4ed8;}
+.fb-tab.complaint-tab.active{background:#dc2626;border-color:#dc2626;}
+.feedback-body{padding:16px;}
+.fb-panel{display:none;}
+.fb-panel.active{display:block;}
+.fb-group{display:flex;flex-direction:column;gap:4px;margin-bottom:14px;}
+.fb-group label{font-size:12px;font-weight:600;color:#374151;}
+.fb-group input,.fb-group textarea,.fb-group select{padding:12px 14px;border:1.5px solid #e5e7eb;border-radius:12px;font-size:13px;font-family:'Poppins',sans-serif;outline:none;transition:0.2s;}
+.fb-group input:focus,.fb-group textarea:focus,.fb-group select:focus{border-color:#1d4ed8;}
+.star-row{display:flex;gap:6px;font-size:28px;cursor:pointer;padding:4px 0;}
+.star-row span{transition:transform 0.15s;}
+.star-row span:hover{transform:scale(1.25);}
+.fb-submit{width:100%;padding:14px;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;color:white;transition:0.2s;margin-top:4px;}
+.fb-submit.blue{background:#1d4ed8;}
+.fb-submit.red{background:#dc2626;}
+.fb-submit:hover{opacity:0.9;transform:translateY(-1px);}
+.fb-done{display:none;border-radius:14px;padding:18px;text-align:center;margin-top:14px;}
+.fb-done.blue-done{background:#dbeafe;}
+.fb-done.red-done{background:#fee2e2;}
+.fb-done h4{font-size:15px;font-weight:700;margin-bottom:4px;}
+.fb-done p{font-size:13px;color:var(--gray);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="topbar">
+    <div class="logo">
+      <h1>Juice Wala</h1>
+      <p>Fresh Natural Juice Delivered To Your Door</p>
+    </div>
+    <div class="delivery">⚡ 30 Min Delivery<br>📍 Only In Kothrud</div>
+  </div>
+</header>
+
+<section class="hero">
+  <h2>Fresh Juice & Coconut Milk 🍹</h2>
+  <p>Freshly prepared juices, fruit chart, coconut milk and beverages delivered quickly across Kothrud. Order online and confirm directly on WhatsApp.</p>
+  <div class="location">📍 Pune, Kothrud</div>
+</section>
+
+<div class="categories">
+  <button class="active" onclick="filterProducts('All',this)">All</button>
+  <button onclick="filterProducts('Juice',this)">Juice</button>
+  <button onclick="filterProducts('coconut milk & more',this)">Coconut Milk</button>
+  <button onclick="filterProducts('fruit chart',this)">Fruit Chart</button>
+</div>
+
+<section class="products" id="productContainer"></section>
+
+<!-- Floating Buttons -->
+<div class="cart-float" onclick="openCart()">
+  🛒
+  <div class="cart-count" id="cartCount">0</div>
+</div>
+
+<button class="whatsapp-float" onclick="quickWhatsApp()">💬 WhatsApp</button>
+<button class="track-float" onclick="openTracking()">📦 Track Order</button>
+
+<!-- Cart Modal -->
+<div class="cart-modal" id="cartModal">
+  <div class="cart-box">
+    <div class="cart-header">
+      <h2>Your Cart 🛒</h2>
+      <div class="close-cart" onclick="closeCart()">×</div>
+    </div>
+    <div class="success" id="successMsg">
+      ✅ Order placed! Your Order ID: <strong id="displayOrderId"></strong><br>
+      Juice Wala will contact you shortly. Use Track Order to follow your order!
+    </div>
+    <div id="cartItems"></div>
+    <div class="total" id="grandTotal">Total: ₹0</div>
+
+    <div class="checkout-form" id="checkoutForm">
+      <input type="text" id="custName" placeholder="Your Name" required>
+      <input type="tel" id="custPhone" placeholder="Phone Number" required>
+      <textarea id="custAddress" rows="3" placeholder="Delivery Address" required></textarea>
+      <textarea id="custNote" rows="2" placeholder="Special Instructions (optional)"></textarea>
+
+      <div class="order-actions">
+        <button class="place-btn" onclick="placeOrder('form')">📦 Place Order (Get Order ID)</button>
+        <div class="or-divider">or order via</div>
+        <button class="whatsapp-btn" onclick="placeOrder('whatsapp')">💬 Order via WhatsApp</button>
+        <button class="gmail-btn" onclick="placeOrder('gmail')">📧 Order via Gmail</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Order Tracking Modal -->
+<div class="track-modal" id="trackModal">
+  <div class="track-box">
+    <div class="track-header">
+      <h2>📦 Track Order</h2>
+      <div class="close-track" onclick="closeTracking()">×</div>
+    </div>
+
+    <div class="track-tabs">
+      <button class="track-tab active" onclick="switchTrackTab('my', this)">My Orders</button>
+      <button class="track-tab" onclick="switchTrackTab('search', this)">Track by ID</button>
+    </div>
+
+    <div id="tabMyOrders">
+      <div id="myOrdersList"></div>
+    </div>
+
+    <div id="tabSearch" style="display:none;">
+      <div class="track-id-input">
+        <input type="text" id="trackIdInput" placeholder="Enter Order ID (e.g. JW-1234)">
+        <button onclick="searchOrder()">Track</button>
+      </div>
+      <div id="searchResult"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Nutrition Info Modal -->
+<div class="nutrition-modal" id="nutritionModal">
+  <div class="nutrition-box">
+    <h3 id="nutProductName">Apple Juice</h3>
+    <div class="nut-sub">Per serving (250ml approx)</div>
+    <div class="nut-grid" id="nutGrid"></div>
+    <button class="close-nut-btn" onclick="closeNutrition()">Got it! 👍</button>
+  </div>
+</div>
+
+<!-- Add to Cart Toast -->
+<div class="nut-toast" id="nutToast">
+  <div class="nut-toast-title" id="toastTitle">🧃 Added to Cart!</div>
+  <div id="toastBody"></div>
+</div>
+
+<!-- ── About Us ── -->
+<section class="about-section">
+  <div class="about-banner">
+    <h2>🍹 About Juice Wala</h2>
+    <p>Pune's favourite fresh juice destination, serving Kothrud with love since day one.</p>
+  </div>
+  <div class="about-body">
+    <div class="about-stats">
+      <div class="stat-card"><div class="stat-val">500+</div><div class="stat-label">Happy Customers</div></div>
+      <div class="stat-card"><div class="stat-val">12+</div><div class="stat-label">Menu Items</div></div>
+      <div class="stat-card"><div class="stat-val">30 min</div><div class="stat-label">Delivery</div></div>
+    </div>
+    <p class="about-story">
+      Juice Wala was born from a simple love for fresh, natural drinks. We believe every glass should be made with real fruit, zero preservatives, and a whole lot of heart. Based in Kothrud, Pune, we deliver freshly prepared juices, creamy coconut milk, and seasonal fruit charts straight to your doorstep — fast, fresh, and always delicious.
+    </p>
+    <div class="about-values">
+      <div class="value-chip"><span>🍎</span>100% Fresh Fruit</div>
+      <div class="value-chip"><span>🚫</span>No Preservatives</div>
+      <div class="value-chip"><span>⚡</span>30 Min Delivery</div>
+      <div class="value-chip"><span>💚</span>Made With Love</div>
+    </div>
+    <div class="about-contact">
+      <h4>📬 Get In Touch</h4>
+      <div class="contact-row">📞 <a href="tel:+917498608089">+91 74986 08089</a></div>
+      <div class="contact-row">💬 <a href="https://wa.me/917498608089" target="_blank">WhatsApp Us</a></div>
+      <div class="contact-row">📧 <a href="mailto:parasrut2005@gmail.com">parasrut2005@gmail.com</a></div>
+      <div class="contact-row">📍 Kothrud, Pune, Maharashtra</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Feedback & Complaint Form ── -->
+<section class="feedback-section">
+  <div class="feedback-header">
+    <h2>💬 Feedback & Complaints</h2>
+    <p>Your voice helps us grow. We read every message!</p>
+  </div>
+
+  <div class="feedback-tabs">
+    <button class="fb-tab active" onclick="switchFbTab('feedback',this)">⭐ Give Feedback</button>
+    <button class="fb-tab complaint-tab" onclick="switchFbTab('complaint',this)">⚠️ Complaint</button>
+  </div>
+
+  <div class="feedback-body">
+
+    <!-- Feedback Panel -->
+    <div class="fb-panel active" id="fbPanelFeedback">
+      <div class="fb-group">
+        <label>Your Name</label>
+        <input type="text" id="fbName" placeholder="e.g. Rahul Sharma">
+      </div>
+      <div class="fb-group">
+        <label>Phone / WhatsApp (optional)</label>
+        <input type="tel" id="fbPhone" placeholder="+91 XXXXX XXXXX">
+      </div>
+      <div class="fb-group">
+        <label>Rate Your Experience</label>
+        <div class="star-row" id="starRow">
+          <span onclick="setRating(1)">☆</span>
+          <span onclick="setRating(2)">☆</span>
+          <span onclick="setRating(3)">☆</span>
+          <span onclick="setRating(4)">☆</span>
+          <span onclick="setRating(5)">☆</span>
+        </div>
+      </div>
+      <div class="fb-group">
+        <label>What did you love? 😍</label>
+        <textarea id="fbMessage" rows="3" placeholder="Tell us about your experience..."></textarea>
+      </div>
+      <div class="fb-group">
+        <label>How can we improve?</label>
+        <textarea id="fbSuggest" rows="2" placeholder="Any suggestions are welcome!"></textarea>
+      </div>
+      <button class="fb-submit blue" onclick="submitFeedback()">✅ Submit Feedback</button>
+      <div class="fb-done blue-done" id="fbDone">
+        <h4>🎉 Thank You!</h4>
+        <p>Your feedback means the world to us. We'll keep getting better for you!</p>
+      </div>
+    </div>
+
+    <!-- Complaint Panel -->
+    <div class="fb-panel" id="fbPanelComplaint">
+      <div class="fb-group">
+        <label>Your Name *</label>
+        <input type="text" id="cpName" placeholder="Your full name">
+      </div>
+      <div class="fb-group">
+        <label>Phone / WhatsApp *</label>
+        <input type="tel" id="cpPhone" placeholder="+91 XXXXX XXXXX">
+      </div>
+      <div class="fb-group">
+        <label>Order ID (if applicable)</label>
+        <input type="text" id="cpOrderId" placeholder="e.g. JW-1234">
+      </div>
+      <div class="fb-group">
+        <label>Type of Issue</label>
+        <select id="cpType">
+          <option value="">Select issue type...</option>
+          <option value="Late Delivery">⏰ Late Delivery</option>
+          <option value="Wrong Order">❌ Wrong Order</option>
+          <option value="Quality Issue">🍹 Quality Issue</option>
+          <option value="Rude Behavior">😠 Rude Behavior</option>
+          <option value="Payment Issue">💳 Payment Issue</option>
+          <option value="Other">📋 Other</option>
+        </select>
+      </div>
+      <div class="fb-group">
+        <label>Describe Your Complaint *</label>
+        <textarea id="cpMessage" rows="4" placeholder="Please describe what went wrong in detail..."></textarea>
+      </div>
+      <button class="fb-submit red" onclick="submitComplaint()">⚠️ Submit Complaint</button>
+      <div class="fb-done red-done" id="cpDone">
+        <h4>📩 Complaint Received</h4>
+        <p>We're sorry for the trouble. Our team will contact you within 24 hours to resolve this.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <p><strong>Juice Wala</strong> — Kothrud, Pune</p>
+  <p>Fresh juices, coconut milk & beverages</p>
+  <p>📞 <a href="tel:+917498608089" style="color:var(--primary);text-decoration:none;">7498608089</a> &nbsp;|&nbsp; 📧 <a href="mailto:parasrut2005@gmail.com" style="color:var(--primary);text-decoration:none;">parasrut2005@gmail.com</a></p>
+  <p style="margin-top:8px;font-size:12px;">Made with 💚 for Kothrud</p>
+</footer>
+
+<script>
+const PHONE = "917498608089";
+const EMAIL = "parasrut2005@gmail.com";
+const FORMSPREE_URL = "https://formspree.io/f/xpqnwjle";
+
+const products = [
+  {id:1,name:"Apple Juice",price:45,category:"Juice",image:"https://i.postimg.cc/1zvJQCVV/1778951131687.png",desc:"Fresh premium apple juice",
+   nutrition:{calories:120,protein:0.3,carbs:28,fat:0.3,fiber:0.5,vitamins:"Vit C, B6"}},
+  {id:2,name:"Watermelon Juice",price:40,category:"Juice",image:"https://i.postimg.cc/FHt6WB3B/1778951639021.png",desc:"Refreshing watermelon juice",
+   nutrition:{calories:85,protein:1.7,carbs:21,fat:0.4,fiber:0.6,vitamins:"Vit A, C, B1"}},
+  {id:3,name:"Mango Juice",price:55,category:"Juice",image:"https://i.postimg.cc/3NNwqR5x/1778951718540.png",desc:"Sweet mango delight",
+   nutrition:{calories:150,protein:1.0,carbs:35,fat:0.6,fiber:1.5,vitamins:"Vit A, C, E"}},
+  {id:4,name:"Grapes Juice",price:50,category:"Juice",image:"https://i.postimg.cc/Bv2N8SzX/1778952070694.png",desc:"Natural grapes juice",
+   nutrition:{calories:130,protein:0.7,carbs:32,fat:0.2,fiber:0.3,vitamins:"Vit C, K, B2"}},
+  {id:5,name:"Black Grapes Juice",price:60,category:"Juice",image:"https://i.postimg.cc/65s3cBbW/1778951840825.png",desc:"Rich black grapes juice",
+   nutrition:{calories:140,protein:0.9,carbs:34,fat:0.3,fiber:0.4,vitamins:"Vit C, K, Iron"}},
+  {id:6,name:"Muskmelon Juice",price:50,category:"Juice",image:"https://i.postimg.cc/Jn13GbJX/1778952116275.png",desc:"Cool muskmelon refreshment",
+   nutrition:{calories:95,protein:1.4,carbs:22,fat:0.3,fiber:1.0,vitamins:"Vit A, C, B9"}},
+  {id:7,name:"Coconut Milk",price:30,category:"coconut milk & more",image:"https://i.postimg.cc/Pfpdp04X/1778953131815.png",desc:"Creamy coconut milk",
+   nutrition:{calories:230,protein:2.3,carbs:6,fat:23,fiber:0,vitamins:"Vit C, Iron, Mg"}},
+  {id:8,name:"Chocolate Coconut Milk",price:70,category:"coconut milk & more",image:"https://i.postimg.cc/gjxZq2NV/1778953461880.png",desc:"Chocolate coconut punch",
+   nutrition:{calories:320,protein:4.0,carbs:28,fat:22,fiber:1.0,vitamins:"Vit D, Iron, Ca"}},
+  {id:9,name:"Lichi Juice",price:65,category:"Juice",image:"https://i.postimg.cc/SRYnssZc/1778952164782.png",desc:"Sweet lichi refreshment",
+   nutrition:{calories:125,protein:0.8,carbs:31,fat:0.4,fiber:0.5,vitamins:"Vit C, B6, Cu"}},
+  {id:10,name:"Fruit Chart Special",price:90,category:"fruit chart",image:"https://images.unsplash.com/photo-1619566636858-adf3ef46400b?q=80&w=800&auto=format&fit=crop",desc:"Mixed fresh fruit chart",
+   nutrition:{calories:180,protein:2.5,carbs:42,fat:1.0,fiber:5.0,vitamins:"Vit A, C, K"}},
+  {id:11,name:"Dry Fruit Coconut Milk",price:85,category:"coconut milk & more",image:"https://images.unsplash.com/photo-1604908176997-431f0d95f4d9?q=80&w=800&auto=format&fit=crop",desc:"Rich dry fruit coconut milk",
+   nutrition:{calories:380,protein:7.0,carbs:18,fat:32,fiber:2.0,vitamins:"Vit E, Iron, Zn"}},
+  {id:12,name:"Cold Coffee",price:70,category:"coconut milk & more",image:"https://images.unsplash.com/photo-1517701604599-bb29b565090c?q=80&w=800&auto=format&fit=crop",desc:"Chilled creamy cold coffee",
+   nutrition:{calories:200,protein:5.0,carbs:26,fat:8,fiber:0,vitamins:"Vit B2, Ca, K"}}
+];
+
+let cart = [];
+let orders = [];
+
+/* ───── Persistent Storage (Artifact API) ───── */
+async function loadStorage(){
+  try {
+    const c = await window.storage.get("juiceCart");
+    if(c) cart = JSON.parse(c.value);
+  } catch(e){ cart = []; }
+  try {
+    const o = await window.storage.get("juiceOrders");
+    if(o) orders = JSON.parse(o.value);
+  } catch(e){ orders = []; }
+  renderCart();
+}
+
+async function saveCart(){
+  try { await window.storage.set("juiceCart", JSON.stringify(cart)); } catch(e){}
+}
+
+async function saveOrders(){
+  try { await window.storage.set("juiceOrders", JSON.stringify(orders)); } catch(e){}
+}
+
+/* ───── Product Display ───── */
+const productContainer = document.getElementById("productContainer");
+
+function displayProducts(items){
+  productContainer.innerHTML = "";
+  items.forEach(p => {
+    productContainer.innerHTML += `
+      <div class="card">
+        <img src="${p.image}" alt="${p.name}" loading="lazy">
+        <div class="card-content">
+          <h3>${p.name}</h3>
+          <div class="cal-badge">🔥 ${p.nutrition.calories} kcal</div>
+          <div class="price">₹${p.price}</div>
+          <div class="desc">${p.desc}</div>
+          <button class="add-btn" onclick="addToCart(${p.id})">Add to Cart</button>
+          <button class="nutrition-btn" onclick="showNutrition(${p.id})">🥗 Nutrition Info</button>
+        </div>
+      </div>`;
+  });
+}
+
+displayProducts(products);
+
+function filterProducts(cat, btn){
+  document.querySelectorAll(".categories button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  displayProducts(cat==="All" ? products : products.filter(p=>p.category===cat));
+}
+
+/* ───── Cart ───── */
+async function addToCart(id){
+  const product = products.find(p=>p.id===id);
+  const existing = cart.find(i=>i.id===id);
+  if(existing) existing.qty++;
+  else cart.push({...product, qty:1});
+  await saveCart(); renderCart();
+  showNutritionToast(product);
+}
+
+function saveCart(){ localStorage.setItem("juiceCart", JSON.stringify(cart)); }
+
+function renderCart(){
+  const cartItems = document.getElementById("cartItems");
+  const cartCount = document.getElementById("cartCount");
+  const grandTotal = document.getElementById("grandTotal");
+  cartItems.innerHTML = "";
+  let total=0, count=0;
+  let totalCal=0, totalProtein=0, totalCarbs=0, totalFat=0;
+
+  if(cart.length===0){
+    cartItems.innerHTML = `<div class="empty">Your cart is empty 🧃</div>`;
+  }
+
+  cart.forEach(item=>{
+    const subtotal = item.price * item.qty;
+    total += subtotal; count += item.qty;
+    const n = item.nutrition;
+    const itemCal = Math.round(n.calories * item.qty);
+    totalCal += itemCal;
+    totalProtein += n.protein * item.qty;
+    totalCarbs += n.carbs * item.qty;
+    totalFat += n.fat * item.qty;
+    cartItems.innerHTML += `
+      <div class="cart-item">
+        <img src="${item.image}" alt="${item.name}">
+        <div class="cart-info">
+          <h4>${item.name}</h4>
+          <p>₹${item.price}</p>
+          <span class="cal-tag">🔥 ${itemCal} kcal · 💪 ${(n.protein*item.qty).toFixed(1)}g protein</span>
+          <div class="qty-controls">
+            <button onclick="changeQty(${item.id},-1)">-</button>
+            <span>${item.qty}</span>
+            <button onclick="changeQty(${item.id},1)">+</button>
+          </div>
+          <p><strong>Subtotal:</strong> ₹${subtotal}</p>
+          <button class="remove-btn" onclick="removeItem(${item.id})">Remove</button>
+        </div>
+      </div>`;
+  });
+
+  if(cart.length > 0){
+    cartItems.innerHTML += `
+      <div class="cart-nutrition-bar">
+        <h4>🥗 Total Nutrition Summary</h4>
+        <div class="cnb-grid">
+          <div class="cnb-item"><div class="cnb-val">${Math.round(totalCal)}</div><div class="cnb-label">Calories</div></div>
+          <div class="cnb-item"><div class="cnb-val">${totalProtein.toFixed(1)}g</div><div class="cnb-label">Protein</div></div>
+          <div class="cnb-item"><div class="cnb-val">${totalCarbs.toFixed(1)}g</div><div class="cnb-label">Carbs</div></div>
+          <div class="cnb-item"><div class="cnb-val">${totalFat.toFixed(1)}g</div><div class="cnb-label">Fat</div></div>
+        </div>
+      </div>`;
+  }
+
+  cartCount.innerText = count;
+  grandTotal.innerText = `Total: ₹${total}`;
+}
+
+async function changeQty(id, change){
+  const item = cart.find(i=>i.id===id);
+  if(!item) return;
+  item.qty += change;
+  if(item.qty<=0) cart = cart.filter(i=>i.id!==id);
+  await saveCart(); renderCart();
+}
+
+async function removeItem(id){
+  cart = cart.filter(i=>i.id!==id);
+  await saveCart(); renderCart();
+}
+
+function openCart(){ document.getElementById("cartModal").style.display="flex"; renderCart(); }
+function closeCart(){ document.getElementById("cartModal").style.display="none"; }
+
+/* ───── Order Summary Builders ───── */
+function getCartTotal(){
+  return cart.reduce((s,i)=>s + i.price*i.qty, 0);
+}
+
+function buildOrderText(name, phone, address, note, orderId){
+  let text = `🍹 *JUICE WALA ORDER*\n`;
+  text += `🆔 Order ID: *${orderId}*\n`;
+  text += `👤 Name: ${name}\n`;
+  text += `📞 Phone: ${phone}\n`;
+  text += `📍 Address: ${address}\n`;
+  if(note) text += `📝 Note: ${note}\n`;
+  text += `\n*Items Ordered:*\n`;
+  cart.forEach(item=>{
+    text += `• ${item.name} x${item.qty} = ₹${item.price*item.qty}\n`;
+  });
+  text += `\n💰 *Total: ₹${getCartTotal()}*`;
+  return text;
+}
+
+function validateForm(){
+  const name    = document.getElementById("custName").value.trim();
+  const phone   = document.getElementById("custPhone").value.trim();
+  const address = document.getElementById("custAddress").value.trim();
+  if(!name){ alert("Please enter your name"); return null; }
+  if(!phone){ alert("Please enter your phone number"); return null; }
+  if(!address){ alert("Please enter delivery address"); return null; }
+  if(cart.length===0){ alert("Your cart is empty!"); return null; }
+  return { name, phone, address, note: document.getElementById("custNote").value.trim() };
+}
+
+function generateOrderId(){
+  return "JW-" + Math.floor(1000 + Math.random()*9000);
+}
+
+async function saveOrder(orderId, name, phone, address, note, method){
+  const order = {
+    id: orderId,
+    name, phone, address, note,
+    method,
+    items: cart.map(i=>({...i})),
+    total: getCartTotal(),
+    time: Date.now(),
+    status: "placed"
+  };
+  orders.push(order);
+  await saveOrders();
+  return order;
+}
+
+/* ───── Place Order ───── */
+async function placeOrder(method){
+  const fields = validateForm();
+  if(!fields) return;
+  const { name, phone, address, note } = fields;
+  const orderId = generateOrderId();
+
+  // Snapshot cart BEFORE any async calls clear it
+  const cartSnapshot = cart.map(i=>({...i}));
+  const cartTotal = getCartTotal();
+
+  await saveOrder(orderId, name, phone, address, note, method);
+
+  if(method === "whatsapp"){
+    const text = buildOrderText(name, phone, address, note, orderId);
+    const url = `https://wa.me/${PHONE}?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank");
+    sendToFormspree(orderId, name, phone, address, note, "WhatsApp", cartSnapshot, cartTotal);
+    await showSuccess(orderId);
+
+  } else if(method === "gmail"){
+    const subject = `New Juice Wala Order - ${orderId}`;
+    let body = `Order ID: ${orderId}\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\n`;
+    if(note) body += `Note: ${note}\n`;
+    body += `\nItems Ordered:\n`;
+    cartSnapshot.forEach(item=>{ body += `- ${item.name} x${item.qty} = Rs.${item.price*item.qty}\n`; });
+    body += `\nTotal: Rs.${cartTotal}`;
+    const url = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = url;
+    await showSuccess(orderId);
+
+  } else {
+    // Check Formspree is configured
+    if(FORMSPREE_URL.includes("YOUR_FORM_ID")){
+      alert("⚠️ Formspree is not configured yet.\n\n1. Go to formspree.io\n2. Create a form\n3. Replace YOUR_FORM_ID in the code with your actual form ID.");
+      return;
+    }
+    const btn = document.querySelector(".place-btn");
+    btn.disabled = true;
+    btn.innerText = "Sending...";
+    const { ok, error } = await sendToFormspree(orderId, name, phone, address, note, "Online Form", cartSnapshot, cartTotal);
+    btn.disabled = false;
+    btn.innerText = "📦 Place Order (Get Order ID)";
+    if(ok){
+      await showSuccess(orderId);
+    } else {
+      alert("⚠️ Order could not be sent to Formspree.\n\nReason: " + error + "\n\nPlease use WhatsApp or Gmail to place your order.");
+    }
+  }
+}
+
+/* ───── Formspree Submission ───── */
+async function sendToFormspree(orderId, name, phone, address, note, method, cartSnapshot, cartTotal){
+  const itemsText = cartSnapshot.map(i => `${i.name} x${i.qty} = Rs.${i.price * i.qty}`).join(" | ");
+
+  const payload = {
+    _subject: `New Juice Wala Order - ${orderId}`,
+    order_id: orderId,
+    customer_name: name,
+    phone: phone,
+    address: address,
+    special_note: note || "None",
+    items: itemsText,
+    total: `Rs.${cartTotal}`,
+    order_method: method,
+    order_time: new Date().toLocaleString("en-IN")
+  };
+
+  try {
+    const res = await fetch(FORMSPREE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok) return { ok: true };
+    return { ok: false, error: data.error || `Server returned ${res.status}` };
+  } catch(e) {
+    return { ok: false, error: e.message || "Network error" };
+  }
+}
+
+async function showSuccess(orderId){
+  document.getElementById("displayOrderId").innerText = orderId;
+  document.getElementById("successMsg").style.display = "block";
+  document.getElementById("checkoutForm").style.opacity = "0.4";
+  document.getElementById("checkoutForm").style.pointerEvents = "none";
+  cart = [];
+  await saveCart();
+  renderCart();
+  setTimeout(()=>{
+    document.getElementById("successMsg").style.display = "none";
+    document.getElementById("checkoutForm").style.opacity = "1";
+    document.getElementById("checkoutForm").style.pointerEvents = "auto";
+    document.getElementById("custName").value = "";
+    document.getElementById("custPhone").value = "";
+    document.getElementById("custAddress").value = "";
+    document.getElementById("custNote").value = "";
+  }, 6000);
+}
+
+/* ───── Quick WhatsApp (no order) ───── */
+function quickWhatsApp(){
+  if(cart.length > 0){
+    const text = `Hi Juice Wala! I'd like to place an order:\n` +
+      cart.map(i=>`• ${i.name} x${i.qty} = ₹${i.price*i.qty}`).join("\n") +
+      `\n\nTotal: ₹${getCartTotal()}`;
+    window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(text)}`, "_blank");
+  } else {
+    window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent("Hi! I'd like to order from Juice Wala 🍹")}`, "_blank");
+  }
+}
+
+/* ───── Order Tracking ───── */
+const STATUSES = [
+  { key:"placed",     label:"Order Placed",     desc:"Your order has been received",           icon:"📋" },
+  { key:"confirmed",  label:"Order Confirmed",   desc:"Juice Wala confirmed your order",        icon:"✅" },
+  { key:"preparing",  label:"Preparing",         desc:"Your juice is being freshly prepared",   icon:"🍹" },
+  { key:"out",        label:"Out for Delivery",  desc:"On the way to your location",            icon:"🛵" },
+  { key:"delivered",  label:"Delivered",         desc:"Enjoy your fresh juice!",                icon:"🎉" }
+];
+
+function getStatusIndex(status){
+  return STATUSES.findIndex(s=>s.key===status);
+}
+
+function getStatusBadgeClass(status){
+  const map = { placed:"status-placed", confirmed:"status-confirmed", preparing:"status-preparing", out:"status-out", delivered:"status-delivered" };
+  return map[status] || "status-placed";
+}
+
+function getSimulatedStatus(order){
+  // Simulate status progression based on time elapsed (for demo purposes)
+  const elapsed = (Date.now() - order.time) / 1000 / 60; // minutes
+  if(elapsed < 1)    return "placed";
+  if(elapsed < 3)    return "confirmed";
+  if(elapsed < 10)   return "preparing";
+  if(elapsed < 25)   return "out";
+  return "delivered";
+}
+
+function renderOrderCard(order, container){
+  const simStatus = getSimulatedStatus(order);
+  const statusIndex = getStatusIndex(simStatus);
+  const timeStr = new Date(order.time).toLocaleString("en-IN",{hour:"2-digit",minute:"2-digit",day:"numeric",month:"short"});
+
+  let timelineHtml = STATUSES.map((s,i)=>{
+    let dotClass = i < statusIndex ? "done" : (i===statusIndex ? "active" : "");
+    return `<div class="tl-step">
+      <div class="tl-dot ${dotClass}">${dotClass==="done"?"✓":STATUSES[i].icon}</div>
+      <div class="tl-text">
+        <h4>${s.label}</h4>
+        <p>${s.desc}</p>
+      </div>
+    </div>`;
+  }).join("");
+
+  const itemsList = order.items.map(i=>`${i.name} x${i.qty}`).join(", ");
+
+  container.innerHTML += `
+    <div class="order-card">
+      <div class="order-card-header">
+        <div>
+          <div class="order-id">🆔 ${order.id}</div>
+          <div class="order-time">🕐 ${timeStr}</div>
+        </div>
+        <span class="order-status-badge ${getStatusBadgeClass(simStatus)}">${STATUSES[statusIndex].label}</span>
+      </div>
+      <div class="order-items-mini"><strong>Items:</strong> ${itemsList}</div>
+      <div class="order-items-mini"><strong>Total:</strong> ₹${order.total} · <strong>Via:</strong> ${order.method}</div>
+      <div class="timeline" style="margin-top:14px;">${timelineHtml}</div>
+    </div>`;
+}
+
+function openTracking(){
+  document.getElementById("trackModal").style.display = "flex";
+  renderMyOrders();
+}
+function closeTracking(){ document.getElementById("trackModal").style.display = "none"; }
+
+function switchTrackTab(tab, btn){
+  document.querySelectorAll(".track-tab").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("tabMyOrders").style.display = tab==="my"?"block":"none";
+  document.getElementById("tabSearch").style.display   = tab==="search"?"block":"none";
+  if(tab==="my") renderMyOrders();
+}
+
+function renderMyOrders(){
+  const container = document.getElementById("myOrdersList");
+  container.innerHTML = "";
+  if(orders.length===0){
+    container.innerHTML = `<div class="no-orders">😕 No orders found.<br>Place an order to track it here!</div>`;
+    return;
+  }
+  // Show most recent first
+  [...orders].reverse().forEach(o => renderOrderCard(o, container));
+}
+
+function searchOrder(){
+  const input = document.getElementById("trackIdInput").value.trim().toUpperCase();
+  const container = document.getElementById("searchResult");
+  container.innerHTML = "";
+  if(!input){ alert("Please enter an Order ID"); return; }
+  const order = orders.find(o=>o.id === input);
+  if(!order){
+    container.innerHTML = `<div class="no-orders">❌ Order <strong>${input}</strong> not found.<br>Orders are stored on this device only.</div>`;
+    return;
+  }
+  renderOrderCard(order, container);
+}
+
+/* ───── Nutrition Info Modal ───── */
+function showNutrition(id){
+  const p = products.find(x=>x.id===id);
+  const n = p.nutrition;
+  document.getElementById("nutProductName").innerText = p.name;
+  document.getElementById("nutGrid").innerHTML = `
+    <div class="nut-item full">
+      <div class="nut-val">${n.calories}</div>
+      <div class="nut-label">🔥 Calories (kcal)</div>
+    </div>
+    <div class="nut-item">
+      <div class="nut-val">${n.protein}g</div>
+      <div class="nut-label">💪 Protein</div>
+    </div>
+    <div class="nut-item">
+      <div class="nut-val">${n.carbs}g</div>
+      <div class="nut-label">🍞 Carbs</div>
+    </div>
+    <div class="nut-item">
+      <div class="nut-val">${n.fat}g</div>
+      <div class="nut-label">🫙 Fat</div>
+    </div>
+    <div class="nut-item">
+      <div class="nut-val">${n.fiber}g</div>
+      <div class="nut-label">🌿 Fiber</div>
+    </div>
+    <div class="nut-item full" style="background:#f0fdf4;">
+      <div class="nut-val" style="font-size:14px;color:#166534;">${n.vitamins}</div>
+      <div class="nut-label">🧪 Vitamins & Minerals</div>
+    </div>`;
+  document.getElementById("nutritionModal").style.display = "flex";
+}
+function closeNutrition(){ document.getElementById("nutritionModal").style.display = "none"; }
+document.getElementById("nutritionModal").addEventListener("click", function(e){ if(e.target===this) closeNutrition(); });
+
+/* ───── Nutrition Toast ───── */
+let toastTimer;
+function showNutritionToast(product){
+  const n = product.nutrition;
+  document.getElementById("toastTitle").innerText = `✅ ${product.name} added to cart!`;
+  document.getElementById("toastBody").innerHTML = `
+    <div class="nut-toast-row"><span>🔥 Calories</span><span>${n.calories} kcal</span></div>
+    <div class="nut-toast-row"><span>💪 Protein</span><span>${n.protein}g</span></div>
+    <div class="nut-toast-row"><span>🍞 Carbs</span><span>${n.carbs}g</span></div>
+    <div class="nut-toast-row"><span>🧪 Vitamins</span><span>${n.vitamins}</span></div>`;
+  const toast = document.getElementById("nutToast");
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>toast.classList.remove("show"), 3500);
+}
+
+/* ───── Feedback & Complaint ───── */
+let currentRating = 0;
+
+function switchFbTab(tab, btn){
+  document.querySelectorAll(".fb-tab").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("fbPanelFeedback").classList.toggle("active", tab==="feedback");
+  document.getElementById("fbPanelComplaint").classList.toggle("active", tab==="complaint");
+}
+
+function setRating(val){
+  currentRating = val;
+  const stars = document.querySelectorAll("#starRow span");
+  stars.forEach((s,i)=>{ s.textContent = i < val ? "⭐" : "☆"; });
+}
+
+function submitFeedback(){
+  const name = document.getElementById("fbName").value.trim();
+  const phone = document.getElementById("fbPhone").value.trim();
+  const message = document.getElementById("fbMessage").value.trim();
+  const suggest = document.getElementById("fbSuggest").value.trim();
+  if(!name){ alert("Please enter your name"); return; }
+  if(!message){ alert("Please write your feedback"); return; }
+
+  const stars = currentRating > 0 ? "⭐".repeat(currentRating) : "Not rated";
+  const body = `Name: ${name}\nPhone: ${phone || "N/A"}\nRating: ${stars}\n\nFeedback:\n${message}\n\nSuggestion:\n${suggest || "None"}`;
+  const subject = `Juice Wala Feedback from ${name}`;
+  const mailto = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+  // Send via mailto + also open WhatsApp
+  const waText = `🍹 *Juice Wala Feedback*\n👤 ${name}\n${stars}\n\n"${message}"`;
+  window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(waText)}`, "_blank");
+
+  document.getElementById("fbDone").style.display = "block";
+  document.getElementById("fbName").value = "";
+  document.getElementById("fbPhone").value = "";
+  document.getElementById("fbMessage").value = "";
+  document.getElementById("fbSuggest").value = "";
+  setRating(0);
+  setTimeout(()=>{ document.getElementById("fbDone").style.display="none"; }, 5000);
+}
+
+function submitComplaint(){
+  const name = document.getElementById("cpName").value.trim();
+  const phone = document.getElementById("cpPhone").value.trim();
+  const orderId = document.getElementById("cpOrderId").value.trim();
+  const type = document.getElementById("cpType").value;
+  const message = document.getElementById("cpMessage").value.trim();
+  if(!name){ alert("Please enter your name"); return; }
+  if(!phone){ alert("Please enter your phone number"); return; }
+  if(!message){ alert("Please describe your complaint"); return; }
+
+  const waText = `⚠️ *Juice Wala Complaint*\n👤 ${name}\n📞 ${phone}\n${orderId ? "🆔 Order: "+orderId+"\n" : ""}📋 Issue: ${type || "General"}\n\n${message}`;
+  window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(waText)}`, "_blank");
+
+  document.getElementById("cpDone").style.display = "block";
+  document.getElementById("cpName").value = "";
+  document.getElementById("cpPhone").value = "";
+  document.getElementById("cpOrderId").value = "";
+  document.getElementById("cpType").value = "";
+  document.getElementById("cpMessage").value = "";
+  setTimeout(()=>{ document.getElementById("cpDone").style.display="none"; }, 5000);
+}
+
+loadStorage();
+</script>
+</body>
+</html>
